@@ -165,7 +165,7 @@ export function sweep(
         const AABBs = getVoxels(vx, vy, vz);
 
         for (const aabb of AABBs) {
-          const temp = aabb.clone().translate([vx, vy, vz]);
+          const temp = aabb.translate([vx, vy, vz]);
           const collision = sweepAABB(box, temp, velocity);
 
           //Check if this collision is closer than the closest so far.
