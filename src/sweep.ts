@@ -134,12 +134,20 @@ export function sweep(
   getVoxels: (vx: number, vy: number, vz: number) => AABB[],
   box: AABB,
   velocity: number[],
-  epsilon = 1e-8,
+  callback?: (
+    dist: number,
+    axis: number,
+    dir: number,
+    leftover: number[],
+  ) => boolean,
+  translate = true,
+  epsilon = 1e-4,
   maxIterations = 100,
 ) {
   if (maxIterations <= 0) return;
 
   const [vx, vy, vz] = velocity;
+  const mag = Math.sqrt(vx * vx + vy * vy + vz * vz);
 
   // Calculate the broadphase of the box
   const minX = Math.floor(vx > 0 ? box.minX : box.minX + vx);
@@ -157,7 +165,8 @@ export function sweep(
         const AABBs = getVoxels(vx, vy, vz);
 
         for (const aabb of AABBs) {
-          const collision = sweepAABB(box, aabb, velocity);
+          const temp = aabb.clone().translate([vx, vy, vz]);
+          const collision = sweepAABB(box, temp, velocity);
 
           //Check if this collision is closer than the closest so far.
           if (collision.h < closest.h) closest = collision;
@@ -168,15 +177,33 @@ export function sweep(
 
   // Update the entity's position
   // We move the entity slightly away from the block in order to miss seams.
-  const dx = closest.h * vx;
-  // + epsilon * closest.nx;
-  const dy = closest.h * vy;
-  // + epsilon * closest.ny;
-  const dz = closest.h * vz;
-  // + epsilon * closest.nz;
+  const dx = closest.h * vx + epsilon * closest.nx;
+  const dy = closest.h * vy + epsilon * closest.ny;
+  const dz = closest.h * vz + epsilon * closest.nz;
 
-  box.translate([dx, dy, dz]);
+  if (callback) {
+    const axis = closest.nx !== 0 ? 0 : closest.ny !== 0 ? 1 : 2;
+    const dir = -(closest.nx + closest.ny + closest.nz);
+    const leftover = [
+      (1 - closest.h) * vx,
+      (1 - closest.h) * vy,
+      (1 - closest.h) * vz,
+    ];
+    const res = callback(mag * closest.h, axis, dir, leftover);
 
+    // Bail out on truthy response
+    if (res) {
+      return;
+    }
+  }
+
+  if (translate) {
+    box.translate([dx, dy, dz]);
+  } else {
+    return;
+  }
+
+  // No collision
   if (closest.h === 1) return;
 
   // Wall Sliding
@@ -195,6 +222,16 @@ export function sweep(
       (1 - closest.h) * vy - (AdotB / BdotB) * closest.ny,
       (1 - closest.h) * vz - (AdotB / BdotB) * closest.nz,
     ];
-    sweep(getVoxels, box, newVelocity, epsilon, maxIterations - 1);
+
+    // Continue to handle
+    sweep(
+      getVoxels,
+      box,
+      newVelocity,
+      callback,
+      translate,
+      epsilon,
+      maxIterations - 1,
+    );
   }
 }
