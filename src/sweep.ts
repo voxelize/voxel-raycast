@@ -134,14 +134,14 @@ export function sweep(
   getVoxels: (vx: number, vy: number, vz: number) => AABB[],
   box: AABB,
   velocity: number[],
-  callback?: (
+  callback: (
     dist: number,
     axis: number,
     dir: number,
     leftover: number[],
   ) => boolean,
   translate = true,
-  epsilon = 1e-4,
+  epsilon = 1e-6,
   maxIterations = 100,
 ) {
   if (maxIterations <= 0) return;
@@ -150,12 +150,12 @@ export function sweep(
   const mag = Math.sqrt(vx * vx + vy * vy + vz * vz);
 
   // Calculate the broadphase of the box
-  const minX = Math.floor(vx > 0 ? box.minX : box.minX + vx);
-  const minY = Math.floor(vy > 0 ? box.minY : box.minY + vy);
-  const minZ = Math.floor(vz > 0 ? box.minZ : box.minZ + vz);
-  const maxX = Math.floor(vx > 0 ? box.maxX + vx : box.maxX);
-  const maxY = Math.floor(vy > 0 ? box.maxY + vy : box.maxY);
-  const maxZ = Math.floor(vz > 0 ? box.maxZ + vz : box.maxZ);
+  const minX = Math.floor(vx > 0 ? box.minX : box.minX + vx) - 1;
+  const minY = Math.floor(vy > 0 ? box.minY : box.minY + vy) - 1;
+  const minZ = Math.floor(vz > 0 ? box.minZ : box.minZ + vz) - 1;
+  const maxX = Math.floor(vx > 0 ? box.maxX + vx : box.maxX) + 1;
+  const maxY = Math.floor(vy > 0 ? box.maxY + vy : box.maxY) + 1;
+  const maxZ = Math.floor(vz > 0 ? box.maxZ + vz : box.maxZ) + 1;
 
   let closest = { h: 1, nx: 0, ny: 0, nz: 0 };
 
@@ -181,53 +181,32 @@ export function sweep(
   const dy = closest.h * vy + epsilon * closest.ny;
   const dz = closest.h * vz + epsilon * closest.nz;
 
-  if (callback) {
-    const axis = closest.nx !== 0 ? 0 : closest.ny !== 0 ? 1 : 2;
-    const dir = -(closest.nx + closest.ny + closest.nz);
-    const leftover = [
-      (1 - closest.h) * vx,
-      (1 - closest.h) * vy,
-      (1 - closest.h) * vz,
-    ];
-    const res = callback(mag * closest.h, axis, dir, leftover);
-
-    // Bail out on truthy response
-    if (res) {
-      return;
-    }
-  }
-
   if (translate) {
     box.translate([dx, dy, dz]);
-  } else {
-    return;
   }
 
   // No collision
   if (closest.h === 1) return;
 
-  // Wall Sliding
-  // c = a - (a.b)/(b.b) b
-  // c - slide vector (rejection of a over b)
-  // b - normal to the block
-  // a - remaining speed (= (1-h)*speed)
-  const BdotB =
-    closest.nx * closest.nx + closest.ny * closest.ny + closest.nz * closest.nz;
-  if (BdotB !== 0) {
-    // const newVelocity =
-    const AdotB =
-      (1 - closest.h) * (vx * closest.nx + vy * closest.ny + vz * closest.nz);
-    const newVelocity = [
-      (1 - closest.h) * vx - (AdotB / BdotB) * closest.nx,
-      (1 - closest.h) * vy - (AdotB / BdotB) * closest.ny,
-      (1 - closest.h) * vz - (AdotB / BdotB) * closest.nz,
-    ];
+  const axis = closest.nx !== 0 ? 0 : closest.ny !== 0 ? 1 : 2;
+  const dir = -(closest.nx + closest.ny + closest.nz);
+  const leftover = [
+    (1 - closest.h) * vx,
+    (1 - closest.h) * vy,
+    (1 - closest.h) * vz,
+  ];
 
-    // Continue to handle
+  // Bail out on truthy response
+  if (dir !== 0 && callback(mag * closest.h, axis, dir, leftover)) {
+    return;
+  }
+
+  // Continue to handle
+  if (leftover[0] ** 2 + leftover[1] ** 2 + leftover[2] ** 2 != 0.0) {
     sweep(
       getVoxels,
       box,
-      newVelocity,
+      leftover,
       callback,
       translate,
       epsilon,

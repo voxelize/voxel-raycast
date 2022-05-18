@@ -31,14 +31,14 @@ const controls = new OrbitControls(camera, renderer.domElement);
 // test
 const engine = new Engine(
   (vx, vy, vz) => {
-    if (vy === 0) {
-      return [new AABB(0, 0, 0, 1, 0.5, 1)];
+    if (vy <= 0) {
+      return [new AABB(0, 0, 0, 1, 1, 1)];
     }
     return [];
   },
   () => false,
   {
-    gravity: [0, -24, 0],
+    gravity: [0, -9.8, 0],
     minBounceImpulse: 0.5,
     airDrag: 0.1,
     fluidDrag: 1.4,
@@ -76,9 +76,10 @@ const updateRBRender = (body, mesh) => {
 };
 
 const body = engine.addBody({
+  aabb: new AABB(0, 0, 0, 10, 10, 10),
   autoStep: true,
 });
-body.setPosition([0, 10, 0]);
+body.setPosition([3, 100, 3]);
 const mesh = renderAABB(body.aabb);
 scene.add(mesh);
 
