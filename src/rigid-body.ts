@@ -42,7 +42,7 @@ class RigidBody {
     return [
       this.aabb.minX + this.aabb.width / 2,
       this.aabb.minY,
-      this.aabb.minZ + this.aabb.depth,
+      this.aabb.minZ + this.aabb.depth / 2,
     ];
   };
 
