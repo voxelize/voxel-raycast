@@ -29,12 +29,21 @@ class RigidBody {
   }
 
   setPosition = (p: number[]) => {
-    this.aabb.setPosition(p);
+    this.aabb.setPosition([
+      p[0] - this.aabb.width / 2,
+      p[1],
+      p[2] - this.aabb.depth / 2,
+    ]);
+
     this.markActive();
   };
 
   getPosition = () => {
-    return [this.aabb.minX, this.aabb.minY, this.aabb.minZ];
+    return [
+      this.aabb.minX + this.aabb.width / 2,
+      this.aabb.minY,
+      this.aabb.minZ + this.aabb.depth,
+    ];
   };
 
   applyForce = (f: number[]) => {
