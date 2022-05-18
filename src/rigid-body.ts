@@ -16,10 +16,10 @@ class RigidBody {
 
   constructor(
     public aabb: AABB,
-    public readonly mass: number,
-    public readonly friction: number,
-    public readonly restitution: number,
-    public readonly gravityMultiplier: number,
+    public mass: number,
+    public friction: number,
+    public restitution: number,
+    public gravityMultiplier: number,
     public autoStep: boolean,
     public onCollide?: (impacts?: number[]) => void,
     public onStep?: () => void,
