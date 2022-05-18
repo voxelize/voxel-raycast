@@ -31,7 +31,7 @@ class RigidBody {
   setPosition = (p: number[]) => {
     this.aabb.setPosition([
       p[0] - this.aabb.width / 2,
-      p[1],
+      p[1] - this.aabb.height / 2,
       p[2] - this.aabb.depth / 2,
     ]);
 
@@ -41,7 +41,7 @@ class RigidBody {
   getPosition = () => {
     return [
       this.aabb.minX + this.aabb.width / 2,
-      this.aabb.minY,
+      this.aabb.minY + this.aabb.height / 2,
       this.aabb.minZ + this.aabb.depth / 2,
     ];
   };
