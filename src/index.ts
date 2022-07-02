@@ -111,6 +111,7 @@ export function raycast(
     });
 
     if (hit !== -1) {
+      console.log(steppedIndex, stepX, stepY, stepZ);
       return {
         point: [px + hit * dx, py + hit * dy, pz + hit * dz],
         normal: [
