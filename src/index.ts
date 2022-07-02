@@ -43,7 +43,7 @@ export class Engine {
       friction: 1,
       restitution: 0,
       gravityMultiplier: 1,
-      stepHeight: 0.5,
+      stepHeight: 0.0,
     };
 
     const {
@@ -311,9 +311,9 @@ export class Engine {
     if (body.resting[1] >= 0 && !body.inFluid) return;
 
     // // direction movement was blocked before trying a step
-    // const xBlocked = body.resting[0] !== 0;
-    // const zBlocked = body.resting[2] !== 0;
-    // if (!(xBlocked || zBlocked)) return;
+    const xBlocked = body.resting[0] !== 0;
+    const zBlocked = body.resting[2] !== 0;
+    if (!(xBlocked || zBlocked)) return;
 
     // original target position before being obstructed
     const targetPos = [
@@ -383,16 +383,8 @@ export class Engine {
     this.processCollisions(oldBox, leftover, tmpResting);
 
     // bail if no movement happened in the originally blocked direction
-    if (
-      // xBlocked &&
-      !approxEquals(oldBox.minX, targetPos[0])
-    )
-      return;
-    if (
-      // zBlocked &&
-      !approxEquals(oldBox.minZ, targetPos[2])
-    )
-      return;
+    if (xBlocked && !approxEquals(oldBox.minX, targetPos[0])) return;
+    if (zBlocked && !approxEquals(oldBox.minZ, targetPos[2])) return;
 
     // done - oldBox is now at the target autostepped position
 
