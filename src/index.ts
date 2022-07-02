@@ -393,7 +393,8 @@ export class Engine {
     if (zBlocked && !approxEquals(oldBox.minZ, targetPos[2])) return;
 
     // done - oldBox is now at the target autostepped position
-    body.aabb = oldBox.clone();
+    // body.aabb = oldBox.clone();
+
     body.resting[0] = tmpResting[0];
     body.resting[2] = tmpResting[2];
 
