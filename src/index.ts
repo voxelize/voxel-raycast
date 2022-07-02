@@ -12,6 +12,7 @@ export type BodyOptions = {
   friction: number;
   restitution: number;
   gravityMultiplier: number;
+  onStep: (newAABB: AABB, resting: number[]) => void;
   onCollide: (impacts?: number[]) => void;
   stepHeight: number;
 };
@@ -45,11 +46,19 @@ export class Engine {
       stepHeight: 0.5,
     };
 
-    const { aabb, mass, friction, restitution, gravityMultiplier, stepHeight } =
-      {
-        ...defaultOptions,
-        ...options,
-      };
+    const {
+      aabb,
+      mass,
+      friction,
+      restitution,
+      gravityMultiplier,
+      stepHeight,
+      onStep,
+      onCollide,
+    } = {
+      ...defaultOptions,
+      ...options,
+    };
 
     const b = new RigidBody(
       aabb,
@@ -58,6 +67,8 @@ export class Engine {
       restitution,
       gravityMultiplier,
       stepHeight,
+      onStep,
+      onCollide,
     );
     this.bodies.push(b);
     return b;
