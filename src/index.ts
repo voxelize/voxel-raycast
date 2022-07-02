@@ -94,10 +94,6 @@ export function raycast(
   let steppedIndex = -1;
 
   while (t <= maxDistance) {
-    const hx = px + t * dx;
-    const hy = py + t * dy;
-    const hz = pz + t * dz;
-
     // exit check
     const aabbs = getVoxel(ix, iy, iz);
 
@@ -116,7 +112,7 @@ export function raycast(
 
     if (hit !== -1) {
       return {
-        point: [hx + hit * dx, hy + hit * dy, hz + hit * dz],
+        point: [px + hit * dx, py + hit * dy, pz + hit * dz],
         normal: [
           steppedIndex === 0 ? -stepX : 0,
           steppedIndex === 1 ? -stepY : 0,
