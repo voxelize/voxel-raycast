@@ -170,20 +170,20 @@ class AABB {
     return this;
   };
 
-  // /**
-  //  * Check to see if AABB intersects with another AABB.
-  //  *
-  //  * @param aabb - Another AABB to test with
-  //  */
-  // intersects = (aabb: AABB) => {
-  //   if (aabb.minX >= this.maxX) return false;
-  //   if (aabb.minY >= this.maxY) return false;
-  //   if (aabb.minZ >= this.maxZ) return false;
-  //   if (aabb.maxX <= this.minX) return false;
-  //   if (aabb.maxY <= this.minY) return false;
-  //   if (aabb.maxZ <= this.minZ) return false;
-  //   return true;
-  // };
+  /**
+   * Check to see if AABB intersects with another AABB.
+   *
+   * @param aabb - Another AABB to test with
+   */
+  intersects = (aabb: AABB) => {
+    if (aabb.minX >= this.maxX) return false;
+    if (aabb.minY >= this.maxY) return false;
+    if (aabb.minZ >= this.maxZ) return false;
+    if (aabb.maxX <= this.minX) return false;
+    if (aabb.maxY <= this.minY) return false;
+    if (aabb.maxZ <= this.minZ) return false;
+    return true;
+  };
 
   // /**
   //  * Check to see if AABB is touching another AABB.
