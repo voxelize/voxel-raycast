@@ -54,7 +54,7 @@ export function raycast(
   origin: number[],
   direction: number[],
   maxDistance: number,
-): { position: number[]; normal: number[]; voxel: number[] } | null {
+): { point: number[]; normal: number[]; voxel: number[] } | null {
   let dx = +direction[0];
   let dy = +direction[1];
   let dz = +direction[2];
@@ -111,7 +111,7 @@ export function raycast(
 
     if (hit !== -1) {
       return {
-        position: [hx + hit * dx, hy + hit * dy, hz + hit * dz],
+        point: [hx + hit * dx, hy + hit * dy, hz + hit * dz],
         normal: [
           steppedIndex === 0 ? -stepX : 0,
           steppedIndex === 1 ? -stepY : 0,
