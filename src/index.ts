@@ -313,7 +313,10 @@ export class Engine {
     // // direction movement was blocked before trying a step
     const xBlocked = body.resting[0] !== 0;
     const zBlocked = body.resting[2] !== 0;
-    if (!(xBlocked || zBlocked)) return;
+
+    if (xBlocked && zBlocked) return;
+    if (xBlocked) dx[0] = 0;
+    if (zBlocked) dx[2] = 0;
 
     // original target position before being obstructed
     const targetPos = [
