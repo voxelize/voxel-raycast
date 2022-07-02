@@ -1,6 +1,6 @@
 {
   "name": "@voxelize/voxel-physics-engine",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "files": [
     "dist"
   ],
