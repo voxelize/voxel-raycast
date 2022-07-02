@@ -42,22 +42,14 @@ export class Engine {
       friction: 1,
       restitution: 0,
       gravityMultiplier: 1,
-      onCollide: () => {},
       stepHeight: 0.5,
     };
 
-    const {
-      aabb,
-      mass,
-      friction,
-      restitution,
-      gravityMultiplier,
-      onCollide,
-      stepHeight,
-    } = {
-      ...defaultOptions,
-      ...options,
-    };
+    const { aabb, mass, friction, restitution, gravityMultiplier, stepHeight } =
+      {
+        ...defaultOptions,
+        ...options,
+      };
 
     const b = new RigidBody(
       aabb,
@@ -66,7 +58,6 @@ export class Engine {
       restitution,
       gravityMultiplier,
       stepHeight,
-      onCollide,
     );
     this.bodies.push(b);
     return b;
@@ -391,11 +382,11 @@ export class Engine {
     if (zBlocked && !approxEquals(oldBox.minZ, targetPos[2])) return;
 
     // done - oldBox is now at the target autostepped position
-    body.aabb = oldBox.clone();
-    body.resting[0] = tmpResting[0];
-    body.resting[2] = tmpResting[2];
+    // body.aabb = oldBox.clone();
+    // body.resting[0] = tmpResting[0];
+    // body.resting[2] = tmpResting[2];
 
-    if (body.onStep) body.onStep();
+    if (body.onStep) body.onStep(oldBox, tmpResting);
   };
 
   isBodyAsleep = (body: RigidBody, dt: number, noGravity: boolean) => {
@@ -427,6 +418,19 @@ export class Engine {
     );
 
     return isResting;
+  };
+
+  teleport = (body: RigidBody, position: number[], duration: number) => {
+    const frames = 1000;
+
+    const old = body.getPosition();
+    const dx = (position[0] - old[0]) / frames;
+    const dy = (position[1] - old[1]) / frames;
+    const dz = (position[2] - old[2]) / frames;
+
+    setInterval(() => {
+      body.aabb.translate([dx, dy, dz]);
+    }, duration / frames);
   };
 }
 

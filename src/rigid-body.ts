@@ -21,8 +21,8 @@ class RigidBody {
     public restitution: number,
     public gravityMultiplier: number,
     public stepHeight: number,
+    public onStep?: (newAABB: AABB, resting: number[]) => void,
     public onCollide?: (impacts?: number[]) => void,
-    public onStep?: () => void,
   ) {
     this.airDrag = -1;
     this.fluidDrag = -1;
