@@ -103,7 +103,12 @@ export function raycast(
 
     let hit = -1;
     aabbs.forEach((aabb) => {
-      const dT = raycastAABB(origin, [dx, dy, dz], aabb, maxDistance - t);
+      const dT = raycastAABB(
+        origin,
+        [dx, dy, dz],
+        aabb.clone().translate([ix, iy, iz]),
+        maxDistance - t,
+      );
       if (dT !== -1) {
         hit = dT;
       }
