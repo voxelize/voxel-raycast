@@ -13,7 +13,7 @@ export type BodyOptions = {
   restitution: number;
   gravityMultiplier: number;
   onCollide: (impacts?: number[]) => void;
-  autoStep: boolean;
+  stepHeight: number;
 };
 
 export type EngineOptions = {
@@ -26,6 +26,8 @@ export type EngineOptions = {
 
 export class Engine {
   public bodies: RigidBody[] = [];
+
+  public static EPSILON = 1e-10;
 
   constructor(
     private getVoxel: (vx: number, vy: number, vz: number) => AABB[],
@@ -41,7 +43,7 @@ export class Engine {
       restitution: 0,
       gravityMultiplier: 1,
       onCollide: () => {},
-      autoStep: false,
+      stepHeight: 0.5,
     };
 
     const {
@@ -51,7 +53,7 @@ export class Engine {
       restitution,
       gravityMultiplier,
       onCollide,
-      autoStep,
+      stepHeight,
     } = {
       ...defaultOptions,
       ...options,
@@ -63,7 +65,7 @@ export class Engine {
       friction,
       restitution,
       gravityMultiplier,
-      autoStep,
+      stepHeight,
       onCollide,
     );
     this.bodies.push(b);
@@ -170,7 +172,7 @@ export class Engine {
     this.processCollisions(body.aabb, dx, body.resting);
 
     // if autostep, and on ground, run collisions again with stepped up aabb
-    if (body.autoStep) {
+    if (body.stepHeight > 0) {
       this.tryAutoStepping(body, tmpBox, dx);
     }
 
@@ -313,7 +315,7 @@ export class Engine {
 
     // continue autostepping only if headed sufficiently into obstruction
     const ratio = Math.abs(dx[0] / dx[2]);
-    const cutoff = 4;
+    const cutoff = 8;
     if (!xBlocked && ratio > cutoff) return;
     if (!zBlocked && ratio < 1 / cutoff) return;
 
@@ -324,22 +326,43 @@ export class Engine {
       oldBox.minZ + dx[2],
     ];
 
+    let voxel: number[] = [];
+
     // move towards the target until the first X/Z collision
     sweep(
       this.getVoxel,
       oldBox,
       dx,
-      function (_: number, axis: number, dir: number, vec: number[]) {
+      function (
+        _: number,
+        axis: number,
+        dir: number,
+        vec: number[],
+        vox?: number[],
+      ) {
         if (axis === 1) {
           vec[axis] = 0;
           return false;
-        } else return true;
+        } else {
+          voxel = vox || [];
+          return true;
+        }
       },
     );
 
     const y = body.aabb.minY;
-    const yDist = Math.floor(y + 1.001) - y;
-    const upVec = [0, yDist, 0];
+
+    let maxStep: number = 0;
+
+    if (voxel) {
+      const aabbs = this.getVoxel(voxel[0], voxel[1], voxel[2]);
+      aabbs.forEach((a) => {
+        if (a.maxY > maxStep) maxStep = a.maxY;
+      });
+    }
+
+    const yDist = Math.floor(y) + maxStep - y + Engine.EPSILON;
+    const upVec = [0, Math.min(yDist, body.stepHeight + 0.001), 0];
     let collided = false;
 
     // sweep up, bailing on any obstruction

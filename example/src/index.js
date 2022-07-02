@@ -18,7 +18,7 @@ const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
 
 // camera
-camera.position.set(20, 20, 20);
+camera.position.set(60, 10, 60);
 camera.lookAt(new Vector3(0, 0, 0));
 
 // renderer
@@ -34,11 +34,26 @@ const engine = new Engine(
     if (vy <= 0) {
       return [new AABB(0, 0, 0, 1, 1, 1)];
     }
+
+    if (
+      vy <= 1 &&
+      (vx / 20 > 1 || vx / 20 < -1 || vz / 20 > 1 || vz / 20 < -1)
+    ) {
+      return [new AABB(0, 0, 0, 1, 0.8, 1)];
+    }
+
+    if (
+      vy <= 1 &&
+      (vx / 10 > 1 || vx / 10 < -1 || vz / 10 > 1 || vz / 10 < -1)
+    ) {
+      return [new AABB(0, 0, 0, 1, 0.4, 1)];
+    }
+
     return [];
   },
   () => false,
   {
-    gravity: [0, -9.8, 0],
+    gravity: [0, -24.0, 0],
     minBounceImpulse: 0.5,
     airDrag: 0.1,
     fluidDrag: 1.4,
@@ -50,7 +65,7 @@ const floor = new Mesh(
   new PlaneBufferGeometry(100, 100),
   new MeshBasicMaterial({ color: '#112233', side: DoubleSide }),
 );
-floor.position.y = 0.5;
+floor.position.y = 1;
 floor.rotateX(Math.PI / 2);
 scene.add(floor);
 
@@ -68,18 +83,14 @@ const renderAABB = (aabb) => {
 
 const updateRBRender = (body, mesh) => {
   const p = body.getPosition();
-  mesh.position.set(
-    p[0] + body.aabb.width / 2,
-    p[1] + body.aabb.height / 2,
-    p[2] + body.aabb.depth / 2,
-  );
+  mesh.position.set(...p);
 };
 
 const body = engine.addBody({
-  aabb: new AABB(0, 0, 0, 10, 10, 10),
+  aabb: new AABB(0, 0, 0, 0.8, 1.8, 0.8),
   autoStep: true,
 });
-body.setPosition([3, 100, 3]);
+body.setPosition([0, 30, 0]);
 const mesh = renderAABB(body.aabb);
 scene.add(mesh);
 
@@ -101,7 +112,6 @@ const onAnimationFrameHandler = (timeStamp) => {
 window.requestAnimationFrame(onAnimationFrameHandler);
 
 document.addEventListener('keypress', (event) => {
-  console.log(event.key);
   if (event.key === 'w') {
     body.applyImpulse([10, 0, 0]);
   } else if (event.key === 's') {

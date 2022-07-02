@@ -1,3 +1,4 @@
+import { Engine } from '.';
 import { AABB } from './aabb';
 
 function lineToPlane(unit: number[], vector: number[], normal: number[]) {
@@ -139,9 +140,9 @@ export function sweep(
     axis: number,
     dir: number,
     leftover: number[],
+    voxel?: number[],
   ) => boolean,
   translate = true,
-  epsilon = 1e-6,
   maxIterations = 100,
 ) {
   if (maxIterations <= 0) return;
@@ -157,6 +158,7 @@ export function sweep(
   const maxY = Math.floor(vy > 0 ? box.maxY + vy : box.maxY) + 1;
   const maxZ = Math.floor(vz > 0 ? box.maxZ + vz : box.maxZ) + 1;
 
+  let voxel: number[] = [];
   let closest = { h: 1, nx: 0, ny: 0, nz: 0 };
 
   for (let vx = minX; vx <= maxX; vx++) {
@@ -169,7 +171,10 @@ export function sweep(
           const collision = sweepAABB(box, temp, velocity);
 
           //Check if this collision is closer than the closest so far.
-          if (collision.h < closest.h) closest = collision;
+          if (collision.h < closest.h) {
+            closest = collision;
+            voxel = [vx, vy, vz];
+          }
         }
       }
     }
@@ -177,9 +182,9 @@ export function sweep(
 
   // Update the entity's position
   // We move the entity slightly away from the block in order to miss seams.
-  const dx = closest.h * vx + epsilon * closest.nx;
-  const dy = closest.h * vy + epsilon * closest.ny;
-  const dz = closest.h * vz + epsilon * closest.nz;
+  const dx = closest.h * vx + Engine.EPSILON * closest.nx;
+  const dy = closest.h * vy + Engine.EPSILON * closest.ny;
+  const dz = closest.h * vz + Engine.EPSILON * closest.nz;
 
   if (translate) {
     box.translate([dx, dy, dz]);
@@ -197,20 +202,12 @@ export function sweep(
   ];
 
   // Bail out on truthy response
-  if (dir !== 0 && callback(mag * closest.h, axis, dir, leftover)) {
+  if (dir !== 0 && callback(mag * closest.h, axis, dir, leftover, voxel)) {
     return;
   }
 
   // Continue to handle
   if (leftover[0] ** 2 + leftover[1] ** 2 + leftover[2] ** 2 != 0.0) {
-    sweep(
-      getVoxels,
-      box,
-      leftover,
-      callback,
-      translate,
-      epsilon,
-      maxIterations - 1,
-    );
+    sweep(getVoxels, box, leftover, callback, translate, maxIterations - 1);
   }
 }
