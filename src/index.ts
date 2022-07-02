@@ -6,7 +6,7 @@ function approxEquals(a: number, b: number) {
   return Math.abs(a - b) < 1e-5;
 }
 
-type BodyOptions = {
+export type BodyOptions = {
   aabb: AABB;
   mass: number;
   friction: number;
@@ -16,7 +16,7 @@ type BodyOptions = {
   autoStep: boolean;
 };
 
-type EngineOptions = {
+export type EngineOptions = {
   gravity: number[];
   minBounceImpulse: number;
   airDrag: number;
