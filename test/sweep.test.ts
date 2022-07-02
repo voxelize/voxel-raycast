@@ -3,9 +3,14 @@ import { AABB } from '../src/aabb';
 
 describe('sweep', () => {
   it('works - basics', () => {
-    let getVoxels = () => [];
-    let box = new AABB(0, 0, 0, 1, 1, 1);
-
+    // let getVoxels = () => [];
+    // let box = new AABB(0, 0, 0, 1, 1, 1);
+    // let dir = [0,0,0]
+    // let collided =false
+    // const callback = (dist, axis, dir, lest) => {
+    //   collided = true;
+    //   return true;
+    // }
     // let getVoxels: (...args: any) => boolean = () => false;
     // let box = new AABB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
     // let dir = [0, 0, 0];

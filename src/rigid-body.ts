@@ -20,7 +20,7 @@ class RigidBody {
     public friction: number,
     public restitution: number,
     public gravityMultiplier: number,
-    public autoStep: boolean,
+    public stepHeight: number,
     public onCollide?: (impacts?: number[]) => void,
     public onStep?: () => void,
   ) {
