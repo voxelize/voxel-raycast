@@ -311,8 +311,8 @@ export class Engine {
     if (body.resting[1] >= 0 && !body.inFluid) return;
 
     // // direction movement was blocked before trying a step
-    const xBlocked = body.resting[0] !== 0;
-    const zBlocked = body.resting[2] !== 0;
+    // const xBlocked = body.resting[0] !== 0;
+    // const zBlocked = body.resting[2] !== 0;
     // if (!(xBlocked || zBlocked)) return;
 
     // original target position before being obstructed
