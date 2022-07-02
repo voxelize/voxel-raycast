@@ -315,7 +315,7 @@ export class Engine {
 
     // continue autostepping only if headed sufficiently into obstruction
     const ratio = Math.abs(dx[0] / dx[2]);
-    const cutoff = 8;
+    const cutoff = 4;
     if (!xBlocked && ratio > cutoff) return;
     if (!zBlocked && ratio < 1 / cutoff) return;
 
