@@ -11,7 +11,6 @@ import {
   DoubleSide,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { AABB, Engine } from '../../dist';
 
 const scene = new Scene();
 const camera = new PerspectiveCamera();
@@ -27,40 +26,6 @@ renderer.setClearColor(0x7ec0ee, 1);
 
 // controls
 const controls = new OrbitControls(camera, renderer.domElement);
-
-// test
-const engine = new Engine(
-  (vx, vy, vz) => {
-    if (vy <= 0) {
-      return [new AABB(0, 0, 0, 1, 1, 1)];
-    }
-
-    if (
-      vy <= 1 &&
-      (vx / 20 > 1 || vx / 20 < -1 || vz / 20 > 1 || vz / 20 < -1)
-    ) {
-      return [new AABB(0, 0, 0, 1, 0.8, 1)];
-    }
-
-    if (vy <= 1 && (vz / 10 > 1 || vz / 10 < -1)) {
-      return [new AABB(0, 0, 0, 1, 1.4, 1)];
-    }
-
-    if (vy <= 1 && (vx / 10 > 1 || vx / 10 < -1)) {
-      return [new AABB(0, 0, 0, 1, 0.4, 1)];
-    }
-
-    return [];
-  },
-  () => false,
-  {
-    gravity: [0, -24.0, 0],
-    minBounceImpulse: 0.5,
-    airDrag: 0.1,
-    fluidDrag: 1.4,
-    fluidDensity: 1.4,
-  },
-);
 
 const floor = new Mesh(
   new PlaneBufferGeometry(100, 100),
