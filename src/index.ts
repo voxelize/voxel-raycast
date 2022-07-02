@@ -313,10 +313,7 @@ export class Engine {
     // // direction movement was blocked before trying a step
     const xBlocked = body.resting[0] !== 0;
     const zBlocked = body.resting[2] !== 0;
-
-    if (xBlocked && zBlocked) return;
-    if (xBlocked) dx[0] = 0;
-    if (zBlocked) dx[2] = 0;
+    // if (!(xBlocked || zBlocked)) return;
 
     // original target position before being obstructed
     const targetPos = [
@@ -386,16 +383,24 @@ export class Engine {
     this.processCollisions(oldBox, leftover, tmpResting);
 
     // bail if no movement happened in the originally blocked direction
-    if (xBlocked && !approxEquals(oldBox.minX, targetPos[0])) return;
-    if (zBlocked && !approxEquals(oldBox.minZ, targetPos[2])) return;
+    if (
+      // xBlocked &&
+      !approxEquals(oldBox.minX, targetPos[0])
+    )
+      return;
+    if (
+      // zBlocked &&
+      !approxEquals(oldBox.minZ, targetPos[2])
+    )
+      return;
 
     // done - oldBox is now at the target autostepped position
-    // body.aabb = oldBox.clone();
 
     body.resting[0] = tmpResting[0];
     body.resting[2] = tmpResting[2];
 
     if (body.onStep) body.onStep(oldBox, tmpResting);
+    else body.aabb = oldBox.clone();
   };
 
   isBodyAsleep = (body: RigidBody, dt: number, noGravity: boolean) => {

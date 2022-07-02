@@ -42,10 +42,11 @@ const engine = new Engine(
       return [new AABB(0, 0, 0, 1, 0.8, 1)];
     }
 
-    if (
-      vy <= 1 &&
-      (vx / 10 > 1 || vx / 10 < -1 || vz / 10 > 1 || vz / 10 < -1)
-    ) {
+    if (vy <= 1 && (vz / 10 > 1 || vz / 10 < -1)) {
+      return [new AABB(0, 0, 0, 1, 1.4, 1)];
+    }
+
+    if (vy <= 1 && (vx / 10 > 1 || vx / 10 < -1)) {
       return [new AABB(0, 0, 0, 1, 0.4, 1)];
     }
 
