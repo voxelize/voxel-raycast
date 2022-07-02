@@ -5,7 +5,7 @@ export function raycastAABB(
   normal: number[],
   aabb: AABB,
   maxDistance: number = Infinity,
-): number {
+): { axis: number; distance: number } | null {
   const [nx, ny, nz] = normal;
 
   const t1 = (aabb.minX - origin[0]) / nx;
@@ -19,34 +19,44 @@ export function raycastAABB(
     Math.max(Math.min(t1, t2), Math.min(t3, t4)),
     Math.min(t5, t6),
   );
+  const tMinAxis =
+    tMin === t1 || tMin === t2 ? 0 : tMin === t3 || tMin === t4 ? 1 : 2;
   const tMax = Math.min(
     Math.min(Math.max(t1, t2), Math.max(t3, t4)),
     Math.max(t5, t6),
   );
+  const tMaxAxis =
+    tMin === t1 || tMin === t2 ? 0 : tMin === t3 || tMin === t4 ? 1 : 2;
 
   // if tMax < 0, ray (line) is intersecting AABB, but whole AABB is behind us
   if (tMax < 0) {
-    return -1;
+    return null;
   }
 
   // if tMin > tMax, ray doesn't intersect AABB
   if (tMin > tMax) {
-    return -1;
+    return null;
   }
 
   if (tMin < 0) {
     if (tMax > maxDistance) {
-      return -1;
+      return null;
     }
 
-    return tMax;
+    return {
+      axis: tMaxAxis,
+      distance: tMax,
+    };
   }
 
   if (tMin > maxDistance) {
-    return -1;
+    return null;
   }
 
-  return tMin;
+  return {
+    axis: tMinAxis,
+    distance: tMax,
+  };
 }
 
 export function raycast(
@@ -91,33 +101,30 @@ export function raycast(
   let tyMax = tyDelta < Infinity ? tyDelta * yDist : Infinity;
   let tzMax = tzDelta < Infinity ? tzDelta * zDist : Infinity;
 
-  let steppedIndex = -1;
-
   while (t <= maxDistance) {
     // exit check
     const aabbs = getVoxel(ix, iy, iz);
 
-    let hit = -1;
+    let hit: any;
     aabbs.forEach((aabb) => {
-      const dT = raycastAABB(
+      const result = raycastAABB(
         origin,
         [dx, dy, dz],
         aabb.clone().translate([ix, iy, iz]),
         maxDistance - t,
       );
-      if (dT !== -1) {
-        hit = dT;
+      if (result) {
+        hit = result;
       }
     });
 
-    if (hit !== -1) {
-      console.log(steppedIndex, stepX, stepY, stepZ);
+    if (hit) {
       return {
         point: [px + hit * dx, py + hit * dy, pz + hit * dz],
         normal: [
-          steppedIndex === 0 ? -stepX : 0,
-          steppedIndex === 1 ? -stepY : 0,
-          steppedIndex === 2 ? -stepZ : 0,
+          hit.axis === 0 ? -stepX : 0,
+          hit.axis === 1 ? -stepY : 0,
+          hit.axis === 2 ? -stepZ : 0,
         ],
         voxel: [ix, iy, iz],
       };
@@ -129,24 +136,20 @@ export function raycast(
         ix += stepX;
         t = txMax;
         txMax += txDelta;
-        steppedIndex = 0;
       } else {
         iz += stepZ;
         t = tzMax;
         tzMax += tzDelta;
-        steppedIndex = 2;
       }
     } else {
       if (tyMax < tzMax) {
         iy += stepY;
         t = tyMax;
         tyMax += tyDelta;
-        steppedIndex = 1;
       } else {
         iz += stepZ;
         t = tzMax;
         tzMax += tzDelta;
-        steppedIndex = 2;
       }
     }
   }
