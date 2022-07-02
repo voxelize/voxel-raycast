@@ -23,7 +23,6 @@ export type EngineOptions = {
   airDrag: number;
   fluidDrag: number;
   fluidDensity: number;
-  autoStepCutoff: number;
 };
 
 export class Engine {
@@ -315,11 +314,6 @@ export class Engine {
     const xBlocked = body.resting[0] !== 0;
     const zBlocked = body.resting[2] !== 0;
     if (!(xBlocked || zBlocked)) return;
-
-    // continue autostepping only if headed sufficiently into obstruction
-    const ratio = Math.abs(dx[0] / dx[2]);
-    if (!xBlocked && ratio > this.options.autoStepCutoff) return;
-    if (!zBlocked && ratio < 1 / this.options.autoStepCutoff) return;
 
     // original target position before being obstructed
     const targetPos = [
