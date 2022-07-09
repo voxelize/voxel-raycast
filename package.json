@@ -1,5 +1,5 @@
 {
-  "name": "@voxelize/voxel-raycast",
+  "name": "@voxelize/raycast",
   "version": "1.0.5",
   "files": [
     "dist"
