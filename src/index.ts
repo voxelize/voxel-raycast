@@ -59,7 +59,7 @@ export function raycastAABB(
   };
 }
 
-export function raycast(
+function raycast(
   getVoxel: (vx: number, vy: number, vz: number) => AABB[],
   origin: number[],
   direction: number[],
@@ -120,7 +120,11 @@ export function raycast(
 
     if (hit) {
       return {
-        point: [px + hit * dx, py + hit * dy, pz + hit * dz],
+        point: [
+          px + hit.distance * dx,
+          py + hit.distance * dy,
+          pz + hit.distance * dz,
+        ],
         normal: [
           hit.axis === 0 ? -stepX : 0,
           hit.axis === 1 ? -stepY : 0,
@@ -156,3 +160,6 @@ export function raycast(
 
   return null;
 }
+
+export { raycast };
+export default raycast;
