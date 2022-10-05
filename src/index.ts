@@ -55,7 +55,7 @@ export function raycastAABB(
 
   return {
     axis: tMinAxis,
-    distance: tMax,
+    distance: tMin,
   };
 }
 
@@ -78,12 +78,12 @@ function raycast(
   dy /= ds;
   dz /= ds;
 
-  const [px, py, pz] = origin;
+  const [ox, oy, oz] = origin;
 
   let t = 0.0;
-  let ix = Math.floor(px) | 0;
-  let iy = Math.floor(py) | 0;
-  let iz = Math.floor(pz) | 0;
+  let ix = Math.floor(ox) | 0;
+  let iy = Math.floor(oy) | 0;
+  let iz = Math.floor(oz) | 0;
 
   const stepX = dx > 0 ? 1 : -1;
   const stepY = dy > 0 ? 1 : -1;
@@ -93,9 +93,9 @@ function raycast(
   const tyDelta = Math.abs(1 / dy);
   const tzDelta = Math.abs(1 / dz);
 
-  const xDist = stepX > 0 ? ix + 1 - px : px - ix;
-  const yDist = stepY > 0 ? iy + 1 - py : py - iy;
-  const zDist = stepZ > 0 ? iz + 1 - pz : pz - iz;
+  const xDist = stepX > 0 ? ix + 1 - ox : ox - ix;
+  const yDist = stepY > 0 ? iy + 1 - oy : oy - iy;
+  const zDist = stepZ > 0 ? iz + 1 - oz : oz - iz;
 
   let txMax = txDelta < Infinity ? txDelta * xDist : Infinity;
   let tyMax = tyDelta < Infinity ? tyDelta * yDist : Infinity;
@@ -103,7 +103,7 @@ function raycast(
 
   while (t <= maxDistance) {
     // exit check
-    const aabbs = getVoxel(ix, iy, iz);
+    const aabbs = getVoxel(ix, iy, iz) || [];
 
     let hit: any;
     aabbs.forEach((aabb) => {
@@ -121,9 +121,9 @@ function raycast(
     if (hit) {
       return {
         point: [
-          px + hit.distance * dx,
-          py + hit.distance * dy,
-          pz + hit.distance * dz,
+          ox + hit.distance * dx,
+          oy + hit.distance * dy,
+          oz + hit.distance * dz,
         ],
         normal: [
           hit.axis === 0 ? -stepX : 0,
