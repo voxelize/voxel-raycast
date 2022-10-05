@@ -1,12 +1,12 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const buildPath = './build/';
 
 module.exports = {
   entry: ['./example/src/index.js'],
   output: {
     path: path.join(__dirname, buildPath),
-    filename: '[name].[hash].js',
+    filename: 'index.js',
   },
   mode: 'development',
   target: 'web',
@@ -25,5 +25,12 @@ module.exports = {
       },
     ],
   },
-  plugins: [new HtmlWebpackPlugin({ title: 'three-seed project' })],
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: ['example/src/index.html'],
+    }),
+  ],
+  devServer: {
+    port: 3000,
+  },
 };
