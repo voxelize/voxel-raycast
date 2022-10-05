@@ -111,7 +111,7 @@ function raycast(
         origin,
         [dx, dy, dz],
         aabb.clone().translate([ix, iy, iz]),
-        maxDistance - t,
+        maxDistance,
       );
       if (result) {
         hit = result;
